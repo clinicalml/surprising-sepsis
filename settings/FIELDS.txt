@@ -1,0 +1,65 @@
+#DEMOGRAPHICS
+!mrn:int
+!csn:int
+!gender:string
+!race:string
+!ed_arrival:datetime
+!ed_triage:datetime
+!admission:datetime
+!unit:string
+!discharge:datetime
+!primary_diagnosis:string
+#############
+data/SEPSIS_COHORT_2013-2014_2.DEID.csv|demographics|mrn:MRN.DEID|csn:CSN.DEID|gender:GENDER|race:RACE|ed_arrival:ED_ARRIVED_TIME.DEID|ed_triage:ED_TRIAGE_TIME.DEID|admission:ADM_DATE_TIME.DEID|unit:ADMISSION_FLOOR,HOSP_UNIT|discharge:DISCH_TIME.DEID|primary_diagnosis:PRIMARY_DX
+
+#ALERTS
+!start:datetime
+!description:string
+###################
+
+data/SEPSIS_ALERTS_2013-2014_2.DEID.csv|alert|mrn:PAT_MRN_ID.DEID|csn:PAT_CSN.DEID|start:ALT_ACTION_INST.DEID|description:ALERT_DESC
+
+#INTERVENTIONS
+# required fields
+#   -mrn (int)
+#   -start (datetime)
+#   -description (string)
+#
+# optional fields
+#   -stop (datetime)
+!stop:datetime
+####################
+
+data/SEPSIS_AIRWAYS_2013-2014.DEID.csv|intervention|mrn:MRN.DEID|csn:CSN.DEID|start:PLACEMENT_TIME.DEID|stop:REMOVAL_TIME.DEID|description:DEVICE
+data/SEPSIS_ANTIBIOTICS_.*.DEID.csv|intervention|mrn:MRN.DEID|csn:CSN.DEID|start:TAKEN_TIME.DEID|description:ACTION,MEDICATION
+data/SEPSIS_ICU_2013-2014.DEID.csv|intervention|mrn:MRN.DEID|csn:CSN.DEID|start:ICU_IN_TIME.DEID|stop:ICU_OUT_TIME.DEID|description:ICU_DEPARTMENT
+data/SEPSIS_ORDERS_2013-2014.DEID.csv|intervention|mrn:MRN.DEID|csn:PAT_ENC_CSN_ID.DEID|ordered:ORDER_TIME.DEID|description:PROTOCOL_NAME,SECTION_NAME
+data/SEPSIS_SURG_PROCS_2013-2014.DEID.csv|intervention|mrn:MRN.DEID|csn:CSN.DEID|start:SURGERY_DATE.DEID|stop:SURGERY_DATE.DEID|description:PROC_NAME
+data/SEPSIS_VASOPRESSORS_2013-2014.DEID.csv|intervention|mrn:MRN.DEID|csn:CSN.DEID|start:TAKEN_TIME.DEID|description:ACTION,MEDICATION
+
+#MEASUREMENTS
+# required fields:
+#   -mrn (int)
+#   -measured (datetime)
+#   -description (string)
+# optional fields:
+#   -recorded (datetime)
+#   -ordered (datetime)
+#   -units (string)
+# sort by: measured
+
+!measured:datetime
+!recorded:datetime
+!ordered:datetime
+!units:string
+!result:string
+###################
+
+data/SEPSIS_CULTURE_LAB_2013-2014.DEID.csv|measurement|mrn:MRN.DEID|csn:CSN.DEID|measured:SPECIMN_TAKEN_TIME.DEID|recorded:RESULT_TIME.DEID|description:ORDER_DESCR|result:RESULT_VALUE
+data/SEPSIS_LABS_.*.DEID.csv|measurement|mrn:PAT_MRN_ID.DEID|csn:PAT_ENC_CSN_ID.DEID|ordered:ORDER_TIME.DEID|measured:SPECIMN_TAKEN_TIME.DEID|recorded:RESULT_TIME.DEID|description:COMPONENT|result:ORD_VALUE|units:REFERENCE_UNIT
+data/SEPSIS_MENTAL_STATUS_2013.DEID.csv|measurement|mrn:MRN.DEID|csn:CSN.DEID|measured:RECORDED_TIME.DEID|description:MEASURE|result:MEAS_VALUE
+data/SEPSIS_VITALS_.*.DEID.csv|measurement|mrn:MRN.DEID|csn:CSN.DEID|measured:RECORDED_TIME.DEID|description:MEASURE|result:MEAS_VALUE
+
+#DIAGNOSES
+data/SEPSIS_DX_2013-2014.DEID.csv|diagnosis|mrn:MRN.DEID|csn:csn.DEID|description:icd9,icd9_description
+data/SEPSIS_PROBLEM_LIST_2013-2014.DEID.csv|problem|mrn:MRN.DEID|csn:csn.DEID|start:NOTED_DATE.DEID|stop:RESOLVED_DATE.DEID|description:icd9,icd9_description

@@ -1,0 +1,16 @@
+#ADULT SEPSIS CRITERIA
+#! must include
+#* may include
+#as of 9/4/2013
+# 2hr lookback for vitals
+# 24 hr lookback for labs
+# look into meaning of use most recent
+!|age|Age >= 18
+!|dnr|DNR < 1
+*|temp|Temp > 100.4|Temp < 96.8
+*|pulse|Pulse > 90 
+*|resp|Resp > 20|PC02 ARTERIAL < 32
+*|wbc|WHITE BLOOD CELL COUNT < 4|WHITE BLOOD CELL COUNT > 12|BANDS % > 10
+x|bp|SBP < 90
+#using mmol/L units
+x|lactate|LACTATE, ABG >= 0.44|VENOUS LACTATE >= 0.44|VENOUS LACTATE, POC >= 0.44
