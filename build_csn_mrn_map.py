@@ -17,7 +17,7 @@ for l in infile:
 print len(mrn_to_csn), 'mrn values'
 pickle.dump(mrn_to_csn, file(working_dir+'/patients/mrn_to_csn.pk', 'w'))
 pickle.dump(csn_to_mrn, file(working_dir+'/patients/csn_to_mrn.pk', 'w'))
-outfile = file(working_dir+'/patients/all_csn', 'w')
+outfile = file(working_dir+'/patients/cohort_csn', 'w')
 for csn in csn_to_mrn:
   print >>outfile, csn
 outfile.close()
