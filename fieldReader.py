@@ -9,6 +9,7 @@ class FieldReader:
         self.fields = {}
         fieldfile = file(fields)
         self.typer = {}
+        datatype = None
         for l in fieldfile:
             if '#' == l[0]:
                 continue
@@ -29,9 +30,10 @@ class FieldReader:
                         vals = vals.split(',')
                         self.fields[id] = vals
  
-        print filename, datatype
+        if datatype is None:
+          raise Exception('failed to initialize', filename)
         self.reader = csv.reader(file(filename))
-        self.header = map(string.strip, self.reader.next())
+        self.header = map(string.lower, map(string.strip, self.reader.next()))
         self.inv_header = dict(zip(self.header, xrange(len(self.header))))
 
     def __iter__(self):
@@ -60,9 +62,9 @@ class FieldReader:
                     retdict[k] = v
                 else:
                     try:
-                        retdict[k] = tuple([self.apply_type(l[self.inv_header[i]],k) for i in v])
+                      retdict[k] = tuple([self.apply_type(l[self.inv_header[i.lower()]],k) for i in v])
                     except:
-                        fail = True
+                      pass
 
         return retdict
 

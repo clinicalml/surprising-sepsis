@@ -9,12 +9,19 @@ patient_records = defaultdict(list)
 
 for datafile in os.listdir('data'):
     if 'sorted' in datafile:
-        reader = FieldReader('data/'+datafile)
-        sys.stdout.flush()
+        try:
+          reader = FieldReader('data/'+datafile)
+        except:
+          continue
+        print datafile
         for i,l in enumerate(reader):
-            patient_records[l['mrn']].append(l)
-            if i%1000 == 0:
+            if not 'mrn' in l:
+              print  'odd record', l,
+            else:
+              patient_records[l['mrn']].append(l)
+            if (i+1)%10000 == 0:
                 print i
+                sys.stdout.flush()
     print 'done'
     sys.stdout.flush()
 

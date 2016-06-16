@@ -1,7 +1,7 @@
 from collections import defaultdict
 import cPickle as pickle
 
-infile = file('data/SEPSIS_COHORT_2013-2014_2.DEID.csv')
+infile = file('data/SEPSIS_COHORT_2013-2014.DEID.csv')
 
 infile.readline()
 mrn_to_csn = defaultdict(list)
@@ -11,5 +11,11 @@ for l in infile:
     mrn_to_csn[mrn].append(csn)
     csn_to_mrn[csn] = mrn
 
-pickle.dump(mrn_to_csn, file('mrn_to_csn.pk', 'w'))
-pickle.dump(csn_to_mrn, file('csn_to_mrn.pk', 'w'))
+print len(mrn_to_csn), 'mrn values'
+pickle.dump(mrn_to_csn, file('patients/mrn_to_csn.pk', 'w'))
+pickle.dump(csn_to_mrn, file('patients/csn_to_mrn.pk', 'w'))
+
+outfile = file('patients/all_csn', 'w')
+for csn in csn_to_mrn:
+  print >>outfile, csn
+outfile.close()

@@ -10,7 +10,7 @@
 !discharge:datetime
 !primary_diagnosis:string
 #############
-data/SEPSIS_COHORT_2013-2014_2.DEID.csv|demographics|mrn:MRN.DEID|csn:CSN.DEID|gender:GENDER|race:RACE|ed_arrival:ED_ARRIVED_TIME.DEID|ed_triage:ED_TRIAGE_TIME.DEID|admission:ADM_DATE_TIME.DEID|unit:ADMISSION_FLOOR,HOSP_UNIT|discharge:DISCH_TIME.DEID|primary_diagnosis:PRIMARY_DX
+data/SEPSIS_COHORT_2013-2014.DEID.csv|demographics|mrn:MRN.DEID|csn:CSN.DEID|gender:GENDER|race:RACE|ed_arrival:ED_ARRIVED_TIME.DEID|ed_triage:ED_TRIAGE_TIME.DEID|admission:ADM_DATE_TIME.DEID|unit:ADMISSION_FLOOR,HOSP_UNIT|discharge:DISCH_TIME.DEID|primary_diagnosis:PRIMARY_DX
 
 #ALERTS
 !start:datetime
@@ -56,10 +56,12 @@ data/SEPSIS_VASOPRESSORS_2013-2014.DEID.csv|intervention|mrn:MRN.DEID|csn:CSN.DE
 ###################
 
 data/SEPSIS_CULTURE_LAB_2013-2014.DEID.csv|measurement|mrn:MRN.DEID|csn:CSN.DEID|measured:SPECIMN_TAKEN_TIME.DEID|recorded:RESULT_TIME.DEID|description:ORDER_DESCR|result:RESULT_VALUE
-data/SEPSIS_LABS_.*.DEID.csv|measurement|mrn:PAT_MRN_ID.DEID|csn:PAT_ENC_CSN_ID.DEID|ordered:ORDER_TIME.DEID|measured:SPECIMN_TAKEN_TIME.DEID|recorded:RESULT_TIME.DEID|description:COMPONENT|result:ORD_VALUE|units:REFERENCE_UNIT
+#data/LAB_RESULTS_.*_full.DEID.csv|measurement|mrn:PAT_MRN_ID.DEID|csn:PAT_ENC_CSN_ID.DEID|ordered:ORDER_TIME.DEID|measured:SPECIMN_TAKEN_TIME.DEID|recorded:RESULT_TIME.DEID|description:COMPONENT|result:ORD_VALUE|units:REFERENCE_UNIT
+data/SEPSIS_LABS_[0-9]+.DEID.csv|measurement|mrn:PAT_MRN_ID.DEID|csn:PAT_ENC_CSN_ID.DEID|ordered:ORDER_TIME.DEID|measured:SPECIMN_TAKEN_TIME.DEID|recorded:RESULT_TIME.DEID|description:COMPONENT|result:ORD_VALUE|units:REFERENCE_UNIT
 data/SEPSIS_MENTAL_STATUS_2013.DEID.csv|measurement|mrn:MRN.DEID|csn:CSN.DEID|measured:RECORDED_TIME.DEID|description:MEASURE|result:MEAS_VALUE
 data/SEPSIS_VITALS_.*.DEID.csv|measurement|mrn:MRN.DEID|csn:CSN.DEID|measured:RECORDED_TIME.DEID|description:MEASURE|result:MEAS_VALUE
+data/VITALS_edits_2013-2014.DEID.csv|measurement|mrn:MRN.DEID|csn:CSN.DEID|measured:RECORDED_TIME.DEID|description:MEASURE|result:MEAS_VALUE
 
 #DIAGNOSES
 data/SEPSIS_DX_2013-2014.DEID.csv|diagnosis|mrn:MRN.DEID|csn:csn.DEID|description:icd9,icd9_description
-data/SEPSIS_PROBLEM_LIST_2013-2014.DEID.csv|problem|mrn:MRN.DEID|csn:csn.DEID|start:NOTED_DATE.DEID|stop:RESOLVED_DATE.DEID|description:icd9,icd9_description
+data/SEPSIS_PROBLEM_LIST_2013-2014.DEID.csv|problem|mrn:MRN.DEID|csn:csn.DEID|start:NOTED_DATE.DEID|stop:RESOLVED_DATE.DEID|description:icd9,icd9_desc

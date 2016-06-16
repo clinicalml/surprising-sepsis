@@ -9,10 +9,9 @@ import datetime
 from utils import sortkey
 import random
 
-
-
 csn_to_mrn = pickle.load(file('patients/csn_to_mrn.pk'))
 random.seed(100)
+
 def generate_targets(filename, N):
     alert_csns = set()
     for l in file(filename):
@@ -36,18 +35,27 @@ def expand(records):
                 l.append(entry)
     return l
 
+def directly_generate_targets(N):
+  for l in file('test_alerts.out'):
+    pid, vid = l.split(',')[0].split()[1], l.split(',')[1]
+    if '[' in l:
+      raise StopIteration
+    yield pid, vid
 
+
+  
 
 if len(sys.argv) > 1:
   vid = sys.argv[1]
   targets = [(csn_to_mrn[vid], vid)]
   verbose = True
 else:
-  targets = generate_targets('output/alert_predictions.txt', 1000)
+  #targets = generate_targets('output/alert_predictions.txt', 1000)
+  targets = directly_generate_targets(1000)
   verbose = False
 
 def check_alert((pid,vid)):
-    s = shelve.open('patients/visitShelf')
+    s = shelve.open('patients/visitShelf-update')
     current_time = None
     alert_tracker = Alerter()
     alerts = []
@@ -59,21 +67,21 @@ def check_alert((pid,vid)):
           print e['time'][0], e
 
     for e in sorted(expand(s[pid]), key=sortkey):
-        alerts = alert_tracker.ingest(e)
+        alerts = [a for a,_ in alert_tracker.ingest(e)]
         if 'ALERT' in e['comment'][0] and int(vid) in e['csn']:
             if len(alerts) >= 2 or 'bp' in alerts or 'lactate' in alerts:
+                print 'good', ','.join(map(str, [pid,vid,e['start'][0], e['description'][0], ';'.join(alerts)]))
                 return 1
             else:
+                print 'bad', ','.join(map(str, [pid,vid,e['start'][0], e['description'][0], ';'.join(alerts)]))
                 return 0
             break
 
 pass_fail = [0,0]
-pool = Pool(16)
-retval = pool.imap_unordered(check_alert, targets)
-for r in retval:
+pool = Pool(48)
+retval = pool.imap(check_alert, targets)
+for i, r in enumerate(retval):
+  sys.stdout.flush()
   pass_fail[r] += 1
 
 print '0/1', pass_fail
-
-
-

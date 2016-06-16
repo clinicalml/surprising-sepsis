@@ -1,107 +1,44 @@
 import cPickle as pickle
-from functools import partial
 from multiprocessing import Pool
-import random
+import matplotlib.pyplot as plt
 import sys
-import scipy.sparse as sparse
-import shelve
+from tqdm import tqdm
 import numpy as np
-from Patient import Patient
-from utils import expand, sortkey, to_date, generate_vectors#, generate_targets
-
-vocab, inv_vocab = pickle.load(file('output/vocab.pk'))
-csn_to_mrn = pickle.load(file('patients/csn_to_mrn.pk'))
-ethnicities = pickle.load(file('patients/ethnicities.pk'))
-races = pickle.load(file('patients/races.pk'))
-demographics_offset = 3+len(ethnicities)+len(races)
-random.seed(100)
-
-deadlines = {}
-for l in file('patients/times'):
-  vid = l.split()[0]
-  t = ' '.join(l.split()[-2:])
-  deadlines[vid] = to_date(t)
-
-
-def generate_targets(n_cases=0, n_controls=0, n_alerts=0, test=False):
-  alert_csns = set()
-  case_csns = set()
-  control_csns = set()
-
-  if test:
-    label_file = 'patients/test_sepsis_labels.txt'
-  else:
-    label_file = 'patients/train_sepsis_labels.txt'
-    for l in file('output/alert_predictions.txt'):
-      csn = l.split()[0]
-      label = l.split()[1]
-      if label == '1':
-        alert_csns.add(csn)
-
-  for l in file(label_file):
-    csn = l.split()[0]
-    label = l.split()[1]
-    if label == '1':
-      case_csns.add(csn)
-    else:
-      control_csns.add(csn)
-
-  targets = []
-  labels = [None, -1, 1]
-  for group,label,N in ((alert_csns, None, n_alerts), (case_csns,1, n_cases), (control_csns,-1,n_controls)):
-    group = list(group)
-    random.shuffle(group)
-    if test:
-      targets.extend([(label, csn_to_mrn[vid],vid) for vid in group])
-    else:
-      targets.extend([(label, csn_to_mrn[vid],vid) for vid in group[:N]])
-  return targets
-
-def evaluate_predictor((label, pid, vid, vectors), predictor, threshold, mask):
-  predictions = []
-  alert_time = None
-  #print vectors
-  vec_mat = []
-  for vec, _ in zip(*vectors):
-    t,vec = vec
-    vec_mat.append(vec[0])
-  vec_mat = np.vstack(vec_mat)[:, mask]
-  predictions = predictor.predict_proba(vec_mat)[:, 1]
-
-  return label, pid, vid, max(predictions), alert_time
+from generate_targets import *
+from generate_vectors import *
+from sklearn.metrics import roc_curve, precision_recall_curve
 
 if __name__ == "__main__":
-  mask, predictor = pickle.load(file(sys.argv[1])) 
-  try:
-    threshold = float(sys.argv[2])
-  except:
-    threshold = None
+  predictor = pickle.load(file(sys.argv[1])) 
+  def eval((X,Y)):
+    X = np.vstack([x[1] for x in X])
+    pred = predictor.predict_proba(X)
+    pred = pred[:,1].max()
+    y = Y[0]
+    return pred, y
 
-  pool = Pool(48)
-  #predictor.best_estimator_.set_params(n_jobs=1)
   test_targets = generate_targets(test=True)
-
-  evaluate = partial(evaluate_predictor, predictor=predictor, threshold=threshold, mask=mask)
-
-  outfile = file('output/decision_tree_predictions-deadline.txt', 'w')
+  vector_generator = VectorGenerator()
+  y_true = []
+  y_score = []
+  pool = Pool(32)
+  vectors = vector_generator.generate(test_targets, processes=32)
+  N = len(test_targets)
+  for i, (y_hat,y) in tqdm(enumerate(pool.imap(eval, vectors)), total=N):
+    y_true.append(y)
+    y_score.append(y_hat)
   
-  #for i, target in enumerate(test_targets):
-  #  label, pid,vid,pred,alert_time = evaluate(target)
-  #vectors = []
-  #for l,p,v in test_targets:
-  #  vectors.append(generate_vectors((p,v,l,float('inf'))))
+  fpr, tpr, thresh = roc_curve(y_true, y_score)
+  prec, recall, thres = precision_recall_curve(y_true, y_score)
+  
+  plt.figure('ROC')
+  plt.title('ROC')
+  plt.plot(fpr, tpr)
 
-  print 'generating vectors'
-  vectors = pool.map(generate_vectors, ((p,v,l,float('inf')) for l,p,v in test_targets))
-  test_targets_vec = [(l, p, v, vec) for (l,p,v),vec in zip(test_targets, vectors)]
-  print 'done'
+  plt.figure('PR curve')
+  plt.title('Precision Recall')
+  plt.plot(recall, prec)
+  plt.xlabel('recall')
+  plt.ylabel('precision')
 
-  print 'evaluating vectors'
-  for i, (label, pid, vid, pred, alert_time) in enumerate(pool.imap(evaluate, test_targets_vec, chunksize=30)):
-    if i% 1000 == 0:
-      print i
-    if alert_time is None:
-      print >>outfile, vid, pred, None
-    else:
-      print >>outfile, vid, pred, (alert_time - deadlines[vid]).total_seconds()
-  outfile.close()
+  plt.show()

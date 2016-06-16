@@ -138,7 +138,7 @@ class Patient:
   def get_combined_state(self):
     state = defaultdict(list)
     for k,v in self.clinical_state['history'].items() + self.clinical_state['current'].items():
-      state[k].append(v)
+      state[k].extend(v)
     return state
   
   def get_vector(self, inv_vocab):

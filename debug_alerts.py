@@ -41,7 +41,6 @@ for e in sorted(expand(s[target]), key=sortkey):
     elif 'COHORT' in e['comment'][0]:
         print e
     
-
     alerts = alert_tracker.ingest(e)
 
     print e['time'][0],
@@ -50,10 +49,11 @@ for e in sorted(expand(s[target]), key=sortkey):
     elif 'VITALS-measured' in e['comment'][0]:
         print e['comment'][0], e['description'][0], e['result'][0]
     else:
-        print e['comment'][0], e
+        #print e['comment'][0], e
+        pass
     if 'ALERT' in e['comment'][0]:
         print current_time, '\t', e['description'], alerts
         if len(alerts) < 2:
-            print 'patient state:', alert_tracker.patientState
+            print 'patient state:', alert_tracker.patient.get_combined_state()
             print 'csn', e['csn']
             print 'mrn', e['mrn']

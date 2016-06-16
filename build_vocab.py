@@ -33,4 +33,4 @@ for i,state in enumerate(pool.imap(get_state, train_targets)):
 
 vocab,counts = zip(*filter(lambda x: x[1] > threshold, key_counter.items()))
 inv_vocab = invert_vocab(vocab)
-pickle.dump((vocab, inv_vocab), file('output/new-vocab.pk', 'w'))
+pickle.dump((vocab, inv_vocab), file('output/vocab.pk', 'w'))

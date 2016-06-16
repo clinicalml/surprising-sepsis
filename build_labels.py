@@ -1,4 +1,5 @@
 import string
+import sys
 from collections import defaultdict
 import cPickle as pickle
 from fieldReader import FieldReader
@@ -29,7 +30,7 @@ for i,p in enumerate(reader):
   
 
 
-outfile = file('patients/sepsis_labels-annotated.txt', 'w')
+outfile = file(sys.argv[1], 'w')
 for vid in sorted(all_csn):
     pid = csn_to_mrn[str(vid)]
     if vid in sepsis_patients:

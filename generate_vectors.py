@@ -34,18 +34,18 @@ class VectorGenerator:
     
 def generate_vectors((pid, vid, label, N), apply_filter=False):
   s = shelve.open('patients/visitShelf')
-  d = shelve.open('patients/demographics')
+  #d = shelve.open('patients/demographics')
   patient = Patient(pid, vid, inv_vocab)
   predictions = []
   offset = len(inv_vocab)
 
-  demographics = np.zeros((1,demographics_offset))
-  try:
-    for entry in d[vid].split():
-      k,val = entry.split(':')
-      demographics[0,int(k)]=float(val)
-  except:
-    print 'could not find demographics for', vid
+  #demographics = np.zeros((1,demographics_offset))
+  #try:
+  #  for entry in d[vid].split():
+  #    k,val = entry.split(':')
+  #    demographics[0,int(k)]=float(val)
+  #except:
+  #  print 'could not find demographics for', vid
 
   events = expand(s[str(pid)])
   #d.close()
@@ -53,8 +53,8 @@ def generate_vectors((pid, vid, label, N), apply_filter=False):
   pred = 0
   break_point = deadlines[vid]
   vectors = []
-  vec = np.hstack([demographics, patient.dense_feature_vector])
-  #vec = patient.dense_feature_vector
+  #vec = np.hstack([demographics, patient.dense_feature_vector])
+  vec = patient.dense_feature_vector
   for i, e in enumerate(sorted(events, key=sortkey)):
     t = e['time'][0]
     if i == 0:
@@ -63,8 +63,8 @@ def generate_vectors((pid, vid, label, N), apply_filter=False):
     if 'future' in alerts or t >= break_point:
       break
     if patient.temporal_state == 'current' and change == True:
-      vec = np.hstack([demographics, patient.dense_feature_vector])
-      #vec = np.hstack(demographics, patient.dense_feature_vector])
+      #vec = np.hstack([demographics, patient.dense_feature_vector])
+      vec = patient.dense_feature_vector
       vectors.append((t,vec))
 
   if apply_filter == True:
