@@ -23,11 +23,10 @@ def find_start_end(records, csn):
 
   return records[0]['admission'][0], records[0]['discharge'][0]
 
-
-all_csn = map(int, file('patients/cohort_csn').readlines())
-#all_csn = [31559]
-visitShelf = shelve.open('patients/visitShelf')
-csn_to_mrn = pickle.load(file('patients/csn_to_mrn.pk'))
+working_dir = sys.argv[1]
+all_csn = map(int, file(working_dir+'/patients/cohort_csn').readlines())
+visitShelf = shelve.open(working_dir+'/patients/visitShelf')
+csn_to_mrn = pickle.load(file(working_dir+'/patients/csn_to_mrn.pk'))
 
 def compute_times(vid):
   pid = csn_to_mrn[str(vid)]
@@ -58,7 +57,7 @@ def compute_times(vid):
       sys.exit()
   return  vid, start, end, cutoff_time
 
-outfile = file('patients/times', 'w')
+outfile = file(working_dir+'/patients/times', 'w')
 #outfile = file(os.devnull, 'w')
 pool = Pool(48)
 for i, (vid,start,end,cutoff_time) in enumerate(pool.imap(compute_times, all_csn)):

@@ -8,8 +8,10 @@ from fieldReader import FieldReader
 from utils import sortkey, to_date
 import csv
 
+working_dir = sys.argv[1]
+
 deadlines = {}
-for l in file('patients/times'):
+for l in file(working_dir+'/patients/times'):
   vid = l.split()[0]
   t = ' '.join(l.split()[-2:])
   deadlines[vid] = to_date(t)
@@ -17,8 +19,8 @@ for l in file('patients/times'):
 def extract_from(record, inclusion):
     return (r for r in record if r['comment'][0].lower() in inclusion)
 
-csn_to_mrn = pickle.load(file('patients/csn_to_mrn.pk'))
-test_csn = [int(l.split()[0]) for l in file('patients/test_sepsis_labels.txt').readlines()]
+csn_to_mrn = pickle.load(file(working_dir+'/patients/csn_to_mrn.pk'))
+test_csn = [int(l.split()[0]) for l in file(working_dir+'/patients/test_sepsis_labels.txt').readlines()]
 reader = FieldReader('data/SEPSIS_ALERTS_2013-2014_2.DEID.csv')
 earliest_alert = defaultdict(lambda: datetime.datetime(datetime.MAXYEAR,1,1))
 for i, l in enumerate(reader):
@@ -29,7 +31,7 @@ for i, l in enumerate(reader):
     vid = str(l['csn'][0])
     earliest_alert[vid] = min(l['start'][0], earliest_alert[vid])
 
-outfile = file('output/alert_predictions-deadline.txt', 'w')
+outfile = file(working_dir+'/output/alert_predictions-deadline.txt', 'w')
 for vid in test_csn:
   #pid = int(csn_to_mrn[str(vid)])
   if earliest_alert[str(vid)] < deadlines[str(vid)]:
