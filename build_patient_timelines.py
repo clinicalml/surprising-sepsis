@@ -7,7 +7,7 @@ import shelve
 
 working_dir = sys.argv[1]
 patient_records = defaultdict(list)
-for datafile in file(working_dir+'/settings/FILES_TO_READ'):
+for datafile in file(working_dir+'/settings/FILES_TO_READ.txt'):
     if '#' in datafile:
       continue
     try:
