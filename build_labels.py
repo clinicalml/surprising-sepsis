@@ -16,7 +16,7 @@ reader = FieldReader('data/SEPSIS_DX_2013-2014.DEID.csv')
 
 sepsis_patients = defaultdict(set)
 sepsis_criteria = set(map(string.strip, file('settings/SEPSIS_ICD9').readlines()))
-all_csn = map(int, file(working__dir+'/patients/cohort_csn').readlines())
+all_csn = map(int, file(working_dir+'/patients/cohort_csn').readlines())
 csn_to_mrn = pickle.load(file(working_dir+'/patients/csn_to_mrn.pk'))
 
 for i,p in enumerate(reader):
