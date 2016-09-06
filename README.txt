@@ -14,11 +14,10 @@ When testing, we continuously predict, updating the prediction every time a new 
 
 A few files are already assumed to exist:
   data files in csv format
-  train/test split
-  label file
-  preprocessed patient demographics
-
-
+  labels (run build_labels.py)
+  train/test split (run build_train_test_split.py)
+  mappings between csn and mrns (run build_csn_mrn_map.py)
+  preprocessed patient demographics (run build_demographic_vectors.py)
 
 Main training pipeline:
 -----------------------
