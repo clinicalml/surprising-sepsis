@@ -29,7 +29,12 @@ for i, l in enumerate(reader):
 
     #pid = l['mrn'][0]
     vid = str(l['csn'][0])
-    earliest_alert[vid] = min(l['start'][0], earliest_alert[vid])
+    try:
+      earliest_alert[vid] = min(l['start'][0], earliest_alert[vid])
+    except:
+      print 'error!'
+      print l
+      sys.exit()
 
 outfile = file(working_dir+'/output/alert_predictions-deadline.txt', 'w')
 for vid in test_csn:
