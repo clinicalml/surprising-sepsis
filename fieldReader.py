@@ -35,6 +35,7 @@ class FieldReader:
         self.reader = csv.reader(file(filename))
         self.header = map(string.lower, map(string.strip, self.reader.next()))
         self.inv_header = dict(zip(self.header, xrange(len(self.header))))
+        print self.header
 
     def __iter__(self):
         return self
@@ -63,7 +64,7 @@ class FieldReader:
                 else:
                     try:
                       retdict[k] = tuple([self.apply_type(l[self.inv_header[i.lower()]],k) for i in v])
-                    except:
+                    except Exception as e:
                       pass
 
         return retdict

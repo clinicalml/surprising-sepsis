@@ -11,25 +11,30 @@ import random
 #create a random set of patient ids with a set number of
 #positive labels (cases), negative labels (controls), alerts.
 #if test is true, use all of the test patients.
-def generate_targets(n_cases=0, n_controls=0, n_alerts=0, test=False):
-  csn_to_mrn = pickle.load(file('patients/csn_to_mrn.pk'))
+def generate_targets(n_cases=0, n_controls=0, n_alerts=0, test=False, directory='.'):
+
+  patients_dir = directory+'/patients'
+  output_dir = directory+'/output'
+
+  csn_to_mrn = pickle.load(file(patients_dir+'/csn_to_mrn.pk'))
   alert_csns = set()
   case_csns = set()
   control_csns = set()
 
   if test:
-    label_file = 'patients/test_sepsis_labels.txt'
+    label_file = patients_dir+'/test_sepsis_labels.txt'
   else:
-    label_file = 'patients/train_sepsis_labels.txt'
-    for l in file('output/alert_predictions.txt'):
-      csn = l.split()[0]
-      label = l.split()[1]
-      if label == '1':
-        alert_csns.add(csn)
+    label_file = patients_dir+'/train_sepsis_labels.txt'
+    if n_alerts > 0:
+      for l in file(output_dir+'/alert_predictions.txt'):
+        csn = l.split()[0]
+        label = l.split()[1]
+        if label == '1':
+          alert_csns.add(csn)
 
   for l in file(label_file):
-    csn = l.split()[0]
-    label = l.split()[1]
+    csn = l.split()[1]
+    label = l.split()[2]
     if label == '1':
       case_csns.add(csn)
     else:

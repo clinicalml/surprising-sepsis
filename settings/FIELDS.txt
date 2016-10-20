@@ -10,7 +10,7 @@
 !discharge:datetime
 !primary_diagnosis:string
 #############
-data/SEPSIS_COHORT_2013-2014.DEID.csv|demographics|mrn:MRN.DEID|csn:CSN.DEID|gender:GENDER|race:RACE|ed_arrival:ED_ARRIVED_TIME.DEID|ed_triage:ED_TRIAGE_TIME.DEID|admission:ADM_DATE_TIME.DEID|unit:ADMISSION_FLOOR,HOSP_UNIT|discharge:DISCH_TIME.DEID|primary_diagnosis:PRIMARY_DX
+data/SEPSIS_COHORT_2013-2014_2.DEID.csv|demographics|mrn:MRN.DEID|csn:CSN.DEID|gender:GENDER|race:RACE|ed_arrival:ED_ARRIVED_TIME.DEID|ed_triage:ED_TRIAGE_TIME.DEID|admission:ADM_DATE_TIME.DEID|unit:ADMISSION_FLOOR,HOSP_UNIT|discharge:DISCH_TIME.DEID|primary_diagnosis:PRIMARY_DX
 
 #ALERTS
 !start:datetime

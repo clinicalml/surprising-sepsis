@@ -47,7 +47,7 @@ class Patient:
     self.temporal_state = 'history'
 
   def is_interesting(self, record):
-    for phrase in ['LABS-recorded', 'VITALS-measured', 'MENTAL-measured']:
+    for phrase in ['LABS-recorded', 'VITALS-measured', 'MENTAL-measured', 'edits-measured', 'RESULTS-recorded', 'LIST-start']:
       if phrase in record['comment']:
         return True
     return False
@@ -97,11 +97,11 @@ class Patient:
         try:
           val = record['result'][0]
         except:
-          val = None
-          pass
-
+          val = 'None'
+          
         for v in val.split(';'):
           self.update_state_helper(var,v)
+
 
     return alerts, change
   

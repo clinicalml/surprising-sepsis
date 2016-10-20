@@ -4,6 +4,8 @@ import shelve
 from utils import to_date
 import csv
 
+
+working_dir = sys.argv[1]
 infile = csv.reader(file('data/SEPSIS_COHORT_2013-2014_2.DEID.csv'))
 header = infile.next()
 arrival_times = ['ED_ARRIVED_TIME.DEID', 'ADM_DATE_TIME.DEID', 'IP_ADMIT_DATE_TIME.DEID', 'ED_TRIAGE_TIME.DEID', 'DISCH_TIME.DEID']
@@ -50,10 +52,10 @@ def create_vector(patient_values):
   vec.append(str(ethnicity_index[ethnicity]+3+len(race_index))+':1')
   return ' '.join(vec)
 
-pickle.dump(ethnicities, file('patients/ethnicities.pk', 'w'))
-pickle.dump(races, file('patients/races.pk', 'w'))
+pickle.dump(ethnicities, file(working_dir+'/patients/ethnicities.pk', 'w'))
+pickle.dump(races, file(working_dir+'/patients/races.pk', 'w'))
 
-patient_vectors = shelve.open('patients/demographics')
+patient_vectors = shelve.open(working_dir+'/patients/demographics')
 for pat, vals in patients.items():
   patient_vectors[str(pat[1])] = create_vector(vals)
 

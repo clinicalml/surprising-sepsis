@@ -1,4 +1,5 @@
 import shelve
+import sys
 from Patient import Patient
 import cPickle as pickle
 import numpy as np
@@ -7,69 +8,91 @@ from utils import to_date, expand, sortkey
 import random
 import itertools
 
+
+directory = sys.argv[1]
+output_dir = directory+'/output'
+patients_dir = directory+'/patients'
+print 'loading files'
 try:
-  vocab, inv_vocab = pickle.load(file('output/vocab.pk'))
+  vocab, inv_vocab = pickle.load(file(output_dir+'/vocab.pk'))
 except:
   print 'warning, no vocab files!'
-csn_to_mrn = pickle.load(file('patients/csn_to_mrn.pk'))
-ethnicities = pickle.load(file('patients/ethnicities.pk'))
-races = pickle.load(file('patients/races.pk'))
+csn_to_mrn = pickle.load(file(patients_dir+'/csn_to_mrn.pk'))
+ethnicities = pickle.load(file(patients_dir+'/ethnicities.pk'))
+races = pickle.load(file(patients_dir+'/races.pk'))
 demographics_offset = 4+len(ethnicities)+len(races)
 deadlines = {}
-for l in file('patients/times'):
-  vid = l.split()[0]
+for l in file(patients_dir+'/times'):
+  _vid = l.split()[0]
   t = ' '.join(l.split()[-2:])
-  deadlines[vid] = to_date(t)
+  deadlines[_vid] = to_date(t)
+print 'done'
+
+
 
 class VectorGenerator:
-  def __init__(self, N=10):
+  def __init__(self, N=10, working_dir='.', debug=False):
     self.N = N
+    self.working_dir = working_dir
+    self.debug=debug
 
   def generate(self, targets, processes):
     if processes > 1:
       pool = Pool(processes)
-      return pool.imap(generate_vectors, [(pid, vid, label, self.N) for (label, pid, vid) in targets])
+      return pool.imap(generate_vectors, [(pid, vid, label, self.N, self.working_dir, self.debug) for (label, pid, vid) in targets])
     else:
-      return itertools.imap(generate_vectors, [(pid, vid, label, self.N) for (label, pid, vid) in targets])
+      return itertools.imap(generate_vectors, [(pid, vid, label, self.N, self.working_dir, self.debug) for (label, pid, vid) in targets])
     
-def generate_vectors((pid, vid, label, N), apply_filter=False):
-  s = shelve.open('patients/visitShelf')
-  #d = shelve.open('patients/demographics')
+def generate_vectors((pid, vid, label, N, directory, debug), apply_filter=False):
+
   patient = Patient(pid, vid, inv_vocab)
   predictions = []
   offset = len(inv_vocab)
+  patients_dir = directory+'/patients'
+  s = shelve.open(patients_dir+'/visitShelf')
+  d = shelve.open(patients_dir+'/demographics')
 
-  #demographics = np.zeros((1,demographics_offset))
-  #try:
-  #  for entry in d[vid].split():
-  #    k,val = entry.split(':')
-  #    demographics[0,int(k)]=float(val)
-  #except:
-  #  print 'could not find demographics for', vid
+  demographics = np.zeros((1,demographics_offset))
+  try:
+    for entry in d[vid].split():
+      k,val = entry.split(':')
+      demographics[0,int(k)]=float(val)
+  except:
+    print 'could not find demographics for', vid
 
   events = expand(s[str(pid)])
-  #d.close()
+  d.close()
   s.close()
   pred = 0
   break_point = deadlines[vid]
   vectors = []
-  #vec = np.hstack([demographics, patient.dense_feature_vector])
-  vec = patient.dense_feature_vector
+  demo_vec = np.hstack([demographics, patient.dense_feature_vector])
+  #vec = patient.dense_feature_vector
+  included_demographics = False
   for i, e in enumerate(sorted(events, key=sortkey)):
     t = e['time'][0]
-    if i == 0:
-      vectors.append((t,vec))  #demographics vector
+    if debug:
+      print t
     alerts, change = patient.update_state(e)
+    if debug:
+      print patient.temporal_state
     if 'future' in alerts or t >= break_point:
       break
     if patient.temporal_state == 'current' and change == True:
-      #vec = np.hstack([demographics, patient.dense_feature_vector])
-      vec = patient.dense_feature_vector
+      if not included_demographics:
+        vectors.append((t,demo_vec))  #demographics vector
+        included_demographics = True
+      vec = np.hstack([demographics, patient.dense_feature_vector])
       vectors.append((t,vec))
+      
+  if not included_demographics:
+    vectors.append((t,demo_vec))  #demographics vector
+    included_demographics = True
 
   if apply_filter == True:
     vectors = [max(vectors)] + filter(lambda v: (break_point - v[0]).total_seconds() < 60*60, vectors) #only keep vectors within an hour of physician notice
-  random.shuffle(vectors)
   if N is not None and len(vectors) > N:
+    random.shuffle(vectors)
     vectors = vectors[:N]
+  #print 'label', label
   return vectors, [label]*len(vectors)

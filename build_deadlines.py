@@ -20,6 +20,9 @@ def find_start_end(records, csn):
     pass
     #print 'too many records?'
     #print records
+  if len(records) == 0:
+    print 'no records?'
+    print csn
 
   return records[0]['admission'][0], records[0]['discharge'][0]
 
@@ -34,7 +37,7 @@ def compute_times(vid):
   start, end = find_start_end(record, vid)
   #end_time = find_end(record, vid)
 
-  record = filter(lambda x: x['csn'][0] == vid and cutoff_record(x), record)
+  record = filter(lambda x: 'csn' in x and x['csn'][0] == vid and cutoff_record(x), record)
   record = expand(record)
   #for r in sorted(record, key=sortkey):
   #  if 'ordered' in r:
@@ -61,6 +64,8 @@ outfile = file(working_dir+'/patients/times', 'w')
 #outfile = file(os.devnull, 'w')
 pool = Pool(48)
 for i, (vid,start,end,cutoff_time) in enumerate(pool.imap(compute_times, all_csn)):
+#for i,csn in enumerate(all_csn):
+#  vid, start,end,cutoff_time = compute_times(csn)
   if i % 1000 == 0:
     print i
     outfile.flush()

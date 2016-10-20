@@ -12,19 +12,22 @@ def extract_from(record, inclusion):
 
 
 working_dir = sys.argv[1]
-reader = FieldReader('data/SEPSIS_DX_2013-2014.DEID.csv')
+reader = FieldReader('data/SEPSIS_DX_2013-2014.DEID.csv', fields=working_dir+'/settings/FIELDS.txt')
 
 sepsis_patients = defaultdict(set)
-sepsis_criteria = set(map(string.strip, file('settings/SEPSIS_ICD9').readlines()))
+sepsis_criteria = set(map(string.strip, file(working_dir+'/settings/SEPSIS_ICD9').readlines()))
 all_csn = map(int, file(working_dir+'/patients/cohort_csn').readlines())
 csn_to_mrn = pickle.load(file(working_dir+'/patients/csn_to_mrn.pk'))
 
 for i,p in enumerate(reader):
-  if i % 10000 == 0:
-    print i
 
   pid = p['mrn'][0]
   vid = p['csn'][0]
+  if vid == 7:
+    print p
+
+  if i % 10000 == 0:
+    print i
 
   if p['description'][0] in sepsis_criteria:
     sepsis_patients[vid].add(p['description'][0])

@@ -14,9 +14,9 @@ When testing, we continuously predict, updating the prediction every time a new 
 
 A few files are already assumed to exist:
   data files in csv format
+  mappings between csn and mrns (run build_csn_mrn_map.py)
   labels (run build_labels.py)
   train/test split (run build_train_test_split.py)
-  mappings between csn and mrns (run build_csn_mrn_map.py)
   preprocessed patient demographics (run build_demographic_vectors.py)
 
 Main training pipeline:
@@ -28,6 +28,8 @@ build_patient_timelines.py
 build_deadlines.py
   * reads from visit shelf and determines the "too late" time for each patient.
   * condition for "too late" is contained in function cutoff_record at the top of the file.
+
+build_vocab.py
 
 decision_tree_learning.py
   * reads patient records and builds feature vectors

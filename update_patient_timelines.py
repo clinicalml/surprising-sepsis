@@ -6,16 +6,10 @@ from collections import defaultdict
 import shelve
 
 working_dir = sys.argv[1]
-patient_records = defaultdict(list)
-print 'testing readability of all files'
-for datafile in file(working_dir+'/settings/FILES_TO_READ.txt'):
-    print datafile.strip()
-    reader = FieldReader('data/'+datafile.strip(), fields=working_dir+'/settings/FIELDS.txt')
-print 'done'
+files_to_read = sys.argv[2:]
 
-for datafile in file(working_dir+'/settings/FILES_TO_READ.txt'):
-    if '#' in datafile:
-      continue
+patient_records = defaultdict(list)
+for datafile in files_to_read:
     reader = FieldReader('data/'+datafile.strip(), fields=working_dir+'/settings/FIELDS.txt')
     for i,l in enumerate(reader):
         if not 'mrn' in l:
@@ -24,17 +18,23 @@ for datafile in file(working_dir+'/settings/FILES_TO_READ.txt'):
           patient_records[l['mrn']].append(l)
         if (i+1)%10000 == 0:
             print i
+            print l
             sys.stdout.flush()
-        print l
     print 'done'
     sys.stdout.flush()
 
 print 'writing shelf'
 sys.stdout.flush()
-s = shelve.open(working_dir+'/patients/visitShelf', 'n')
+s = shelve.open(working_dir+'/patients/visitShelf', 'c')
 for i, (k,val) in enumerate(patient_records.iteritems()):
     if i % 100 == 0:
         print 'patient', i,'/',len(patient_records)
         sys.stdout.flush()
-    s[str(k[0])] = val
+    my_val = s[str(k[0])]
+    #remove all problem list items from the original list
+    my_val = [x for x in my_val if 'csn' in x]
+
+    #add back into the original database
+    my_val.extend(val)
+    s[str(k[0])] = my_val
 s.close()

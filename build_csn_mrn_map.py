@@ -4,7 +4,7 @@ import sys
 
 working_dir = sys.argv[1]
 
-infile = file('data/SEPSIS_COHORT_2013-2014.DEID.csv')
+infile = file('data/SEPSIS_COHORT_2013-2014_2.DEID.csv')
 
 infile.readline()
 mrn_to_csn = defaultdict(list)

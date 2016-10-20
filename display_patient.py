@@ -19,15 +19,19 @@ def expand(records):
                 l.append(entry)
     return l
 
-target = sys.argv[1]
+working_dir = sys.argv[1]
+target = sys.argv[2]
+
+patient_dir = working_dir+'/patients'
+
 if 'vid' in sys.argv:
-  csn_to_mrn = pickle.load(file('patients/csn_to_mrn.pk'))
+  csn_to_mrn = pickle.load(file(patient_dir+'/csn_to_mrn.pk'))
   target = csn_to_mrn[target]
-s = shelve.open('patients/visitShelf')
+s = shelve.open(patient_dir+'/visitShelf')
 current_time = None
 
 
-alert_tracker = Alerter()
+#alert_tracker = Alerter()
 alerts = []
 for e in sorted(expand(s[target]), key=sortkey):
     if 'time' in e:
@@ -37,8 +41,9 @@ for e in sorted(expand(s[target]), key=sortkey):
     else:
         pass
 
-    alerts = alert_tracker.ingest(e)
-    print '\t', e['comment'][0].strip(),
+    #alerts = alert_tracker.ingest(e)
+    print e
+    print '\t', e['comment'][0].strip(), 
 
     try:
         print ' '.join([z.strip() for z in e['description']]),'\t',
