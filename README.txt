@@ -14,7 +14,7 @@ When testing, we continuously predict, updating the prediction every time a new 
 
 Assumes that data files are available in csv format
 
-Main training pipeline:
+Main training pipeline (see pipeline.sh):
 -----------------------
 set_up_directory.py
   * creates a working directory where files will be stored
