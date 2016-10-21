@@ -12,15 +12,18 @@ When testing, we continuously predict, updating the prediction every time a new 
 - By varying that threshold we obtain an ROC and precision-recall curve.
 - For any threshold, we can also determine how far before the deadline would the simulated alert fire.
 
-A few files are already assumed to exist:
-  data files in csv format
-  mappings between csn and mrns (run build_csn_mrn_map.py)
-  labels (run build_labels.py)
-  train/test split (run build_train_test_split.py)
-  preprocessed patient demographics (run build_demographic_vectors.py)
+Assumes that data files are available in csv format
 
 Main training pipeline:
 -----------------------
+set_up_directory.py
+  * creates a working directory where files will be stored
+  * settings are copied from the settings/ directory into the working directory
+
+build_csn_mrn_map.py -- builds a mapping between csns and mrns in the cohort
+build_labels.py -- uses icd9 codes to determine a label for each visit
+build_train_test_split.py -- randomly splits visits into train/test
+build_demographic_vectors.py -- demographics are stored separately
 
 build_patient_timelines.py
   * reads patient data from data directory and stores in a shelf file for indexed access.
@@ -40,10 +43,6 @@ decision_tree_testing.py
     time a new piece of information becomes available. Records the maximum value of predicted risk
     as well as first time classifier goes above a specified alerting threshold
 
-roc.py
-  * Uses the output of decision_tree_testing to build an roc and precision recall curve 
-    and compares to simple 2/6 SIRS alerting approaches.
-
 Other important files
 --------------------
   Patient.py
@@ -57,4 +56,20 @@ Other important files
     of data becomes available.)
 
   utils.py
-    * a number of useful utility functions
+    * some useful utility functions
+
+  fieldReader
+    * A CSV reader that extracts important fields and maps to standard names
+
+Settings directory
+------------------
+The settings directory has the following files:
+
+  FIELDS.txt
+    * gives the FieldReader the required information to parse CSV files
+  FILES_TO_READ.txt
+    * a list of files that will be the input from which to build patient representations
+  SEPSIS_CRITERIA.txt
+    * not used
+  SEPSIS_ICD9
+    * ICD9 codes used to define the sepsis outcome

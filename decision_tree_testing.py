@@ -54,7 +54,7 @@ if __name__ == "__main__":
   max_predictions = []
   times = []
   time_thresh = set()
-  test_targets = test_targets[:1000]
+  test_targets = test_targets
 
   vectors = vector_generator.generate(test_targets, processes=32)
   N = len(test_targets)

@@ -1,3 +1,4 @@
+set -e
 WORKDIR=$1
 
 python set_up_dir.py $WORKDIR
